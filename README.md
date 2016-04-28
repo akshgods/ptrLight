@@ -4,7 +4,7 @@ A pull to refresh jQuery plugin for iOS (mobile Safari, WebView) and Android (Ch
 
 A live demo is [available here](http://aurasalexander.github.io/demo.html). On desktop: please consider using the development tools of your browser to switch into mobile device mode. This will allow you to emulate touch events. Your default mouse cursor won't be able to trigger anything.
 
-![QR code with demo page url](http://aurasalexander.github.io/github_io_ptrLight.png "QR code with demo page url" =200x200)
+![QR code with demo page url](http://aurasalexander.github.io/github_io_ptrLight.png =200x200 "QR code with demo page url")
 
 ## Install
 
