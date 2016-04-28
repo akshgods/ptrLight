@@ -116,7 +116,7 @@
                     $(document.body).unbind('touchmove.' + pluginName);
                     self.elast = true;
                 }
-            }, 25));
+            }, 5));
             elem.unbind('touchend.' + pluginName);
             elem.on('touchend.' + pluginName, function(ev) {
                 if (self.options.paused || self.inProgress)
