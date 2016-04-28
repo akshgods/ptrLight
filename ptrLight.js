@@ -16,6 +16,28 @@
         this._name = pluginName;
         this.init();
     }
+    /*https://remysharp.com/2010/07/21/throttling-function-calls*/
+    function throttle(fn, threshhold, scope) {
+        threshhold || (threshhold = 250);
+        var last,
+            deferTimer;
+        return function() {
+            var context = scope || this;
+            var now = +new Date,
+                args = arguments;
+            if (last && now < last + threshhold) {
+                // hold on to it
+                clearTimeout(deferTimer);
+                deferTimer = setTimeout(function() {
+                    last = now;
+                    fn.apply(context, args);
+                }, threshhold);
+            } else {
+                last = now;
+                fn.apply(context, args);
+            }
+        };
+    }
     Plugin.prototype = {
         init: function() {
             var self = this;
@@ -40,6 +62,7 @@
             var top = 0;
             self.isSpinning = false;
             self.elast = true;
+            self.spinnerRotation = 0;
             self.windowDimension = $(window).height();
             self.getTopTranslation = function(top) {
                 return (1.0 - (1.0 / ((top * 0.55 / self.windowDimension) + 1.0))) * self.windowDimension;
@@ -53,15 +76,14 @@
                 fingerOffset = ev.originalEvent.touches[0].pageY - offsetTop
             });
             elem.unbind('touchmove.' + pluginName);
-            elem.on('touchmove.' + pluginName, function(ev) {
+            elem.on('touchmove.' + pluginName, throttle(function(ev) {
                 if (self.inProgress || self.inProgressTouchstart || self.options.paused)
                     return false;
 
-                if (elem.position().top < 0 || (self.options.scrollingDom || elem.parent()).scrollTop() > 0 || document.body.scrollTop > 0) { // trigger refresh only if pulled from the top of the list
+                if ((self.options.scrollingDom || elem.parent()).scrollTop() > 0 || elem.position().top < 0 || document.body.scrollTop > 0) { // trigger refresh only if pulled from the top of the list
                     self.spinner.css('opacity', '0');
                     return true;
                 }
-                self.spinner.css('opacity', '1');
 
                 top = (ev.originalEvent.touches[0].pageY - offsetTop - fingerOffset);
                 if (top > 1) {
@@ -81,18 +103,20 @@
                         self.indicator.css({
                             'top': (topTranslation - self.indicatorHeight) + "px"
                         });
-                    }
 
-                    var rotation = 360 * (top / self.options.pullThreshold);
-                    rotation = rotation > 360 ? 360 : parseInt(rotation, 10);
-                    self.spinner.css({
-                        'transform': 'rotate(' + rotation + 'deg)'
-                    });
+                        self.spinnerRotation = self.spinnerRotation > 359 ? 360 : 360 * (top / self.options.pullThreshold);
+
+                        self.spinner.css({
+                            'opacity': '1',
+                            'transform': 'rotate(' + self.spinnerRotation + 'deg)'
+                        });
+
+                    }
                 } else {
                     $(document.body).unbind('touchmove.' + pluginName);
                     self.elast = true;
                 }
-            });
+            }, 25));
             elem.unbind('touchend.' + pluginName);
             elem.on('touchend.' + pluginName, function(ev) {
                 if (self.options.paused || self.inProgress)
@@ -163,6 +187,7 @@
             setTimeout(function() {
                 self.spinner.removeClass('rotateLoop');
                 self.isSpinning = false;
+                self.spinnerRotation = 0;
                 self.spinner.css('opacity', '0');
                 elem.css({
                     'transition': ''
