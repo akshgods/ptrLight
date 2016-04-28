@@ -2,6 +2,8 @@
 
 A pull to refresh jQuery plugin for iOS (mobile Safari, WebView) and Android (Chromium/Webkit). Based on xpull from [Slobodan Jovanovic](https://github.com/sjovanovic/xpull).
 
+A live demo is [available here](http://aurasalexander.github.io/demo.html). On desktop: please consider using the development tools of your browser to switch into mobile device mode. This will allow you to emulate touch events. Your default mouse cursor won't be able to trigger anything.
+
 ## Install
 
 Include jQuery, ptrLight.js and ptrLight.css
