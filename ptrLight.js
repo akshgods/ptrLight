@@ -19,41 +19,41 @@
     Plugin.prototype = {
         init: function() {
             var self = this;
-            var elm = $(self.element).children();
-            self.elm = elm;
-            elm.parent().find('.pull-indicator').remove();
-            elm.parent().prepend('<div class="pull-indicator"><div class="pull-spinner"></div></div>');
-            self.indicator = elm.parent().find('.pull-indicator:eq(0)');
-            self.spinner = elm.parent().find('.pull-spinner:eq(0)');
+            var elem = $(self.element).children();
+            self.elem = elem;
+            elem.parent().find('#ptr-light-indicator').remove();
+            elem.parent().prepend('<div id="ptr-light-indicator"><div id="ptr-light-spinner"></div></div>');
+            self.indicator = elem.parent().find('#ptr-light-indicator');
+            self.spinner = elem.parent().find('#ptr-light-spinner');
             self.indicatorHeight = self.indicator.outerHeight();
-            $(elm).css({
+            $(elem).css({
                 'transform': "translateY(-" + self.indicatorHeight + "px)"
             });
-            elm.parent().css({
+            elem.parent().css({
                 '-webkit-overflow-scrolling': 'touch'
             });
-            var offsetTop = elm.parent().offset().top;
+            var offsetTop = elem.parent().offset().top;
             var fingerOffset = 0;
             var top = 0;
             self.isSpinning = false;
             self.elast = true;
-            self.windowDimension = elm.parent().outerHeight();
+            self.windowDimension = elem.parent().outerHeight();
             self.getTopTranslation = function(top) {
                 return (1.0 - (1.0 / ((top * 0.55 / self.windowDimension) + 1.0))) * self.windowDimension;
             }
             self.spinner.css('opacity', '0');
-            elm.unbind('touchstart.' + pluginName);
-            elm.on('touchstart.' + pluginName, function(ev) {
+            elem.unbind('touchstart.' + pluginName);
+            elem.on('touchstart.' + pluginName, function(ev) {
                 if (self.options.paused)
                     return false;
                 fingerOffset = ev.originalEvent.touches[0].pageY - offsetTop
             });
-            elm.unbind('touchmove.' + pluginName);
-            elm.on('touchmove.' + pluginName, function(ev) {
+            elem.unbind('touchmove.' + pluginName);
+            elem.on('touchmove.' + pluginName, function(ev) {
                 if (self.options.paused)
                     return false;
 
-                if (elm.position().top < 0 || (self.options.scrollingDom || elm.parent()).scrollTop() > 0 || document.body.scrollTop > 0) { // trigger refresh only if pulled from the top of the list
+                if (elem.position().top < 0 || (self.options.scrollingDom || elem.parent()).scrollTop() > 0 || document.body.scrollTop > 0) { // trigger refresh only if pulled from the top of the list
                     self.spinner.css('opacity', '0');
                     return true;
                 }
@@ -70,7 +70,7 @@
 
                     if (top <= self.options.maxPullThreshold) {
                         var topTranslation = self.getTopTranslation(top);
-                        $(elm).css({
+                        $(elem).css({
                             'transform': "translateY(" + (topTranslation - self.indicatorHeight) + "px)"
                         });
 
@@ -87,17 +87,17 @@
                     self.elast = true;
                 }
             });
-            elm.unbind('touchend.' + pluginName);
-            elm.on('touchend.' + pluginName, function(ev) {
+            elem.unbind('touchend.' + pluginName);
+            elem.on('touchend.' + pluginName, function(ev) {
                 if (self.options.paused)
                     return false;
 
                 if (top > 0) {
                     if (top > self.options.pullThreshold) {
                         self.options.refresh.call(this, self);
-                        self.spinner.addClass('loop');
+                        self.spinner.addClass('rotateLoop');
                         self.isSpinning = true;
-                        elm.css({
+                        elem.css({
                             'transform': 'translateY(0)',
                             'transition': 'transform 300ms ease'
                         });
@@ -116,7 +116,7 @@
                             'top': "-" + self.indicatorHeight + "px",
                             'transition': 'top 300ms ease'
                         });
-                        elm.css({
+                        elem.css({
                             'transform': 'translateY(-' + self.indicatorHeight + 'px)',
                             'transition': 'transform 300ms ease'
                         });
@@ -124,8 +124,7 @@
                     top = 0;
                 }
                 setTimeout(function() {
-                    //self.indicator.removeClass('arrow-rotate-180');
-                    elm.css({
+                    elem.css({
                         'transition': ''
                     });
                     self.indicator.css({
@@ -138,21 +137,20 @@
         },
         done: function() {
             var self = this;
-            var elm = self.elm;
+            var elem = self.elem;
             self.indicator.css({
                 'top': "-" + self.indicatorHeight + "px",
                 'transition': 'top 300ms ease'
             });
-            elm.css({
+            elem.css({
                 'transform': 'translateY(-' + self.indicatorHeight + 'px)',
                 'transition': 'transform 300ms ease'
             });
             setTimeout(function() {
-                self.spinner.removeClass('loop');
+                self.spinner.removeClass('rotateLoop');
                 self.isSpinning = false;
                 self.spinner.css('opacity', '0');
-                self.indicator.removeClass('arrow-rotate-180');
-                elm.css({
+                elem.css({
                     'transition': ''
                 });
                 self.indicator.css({
