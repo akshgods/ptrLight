@@ -41,7 +41,7 @@
     Plugin.prototype = {
         init: function() {
             var self = this;
-            var elem = $(self.element).children();
+            var elem = $(self.element);
             self.elem = elem;
             elem.parent().find('#ptr-light-indicator').remove();
             elem.parent().prepend('<div id="ptr-light-indicator"><div id="ptr-light-spinner"></div></div>');
@@ -57,7 +57,7 @@
             elem.parent().css({
                 '-webkit-overflow-scrolling': 'touch'
             });
-            var offsetTop = elem.parent().offset().top;
+            var offsetTop = elem.parent().offset() ? elem.parent().offset().top : 0;
             var fingerOffset = 0;
             var top = 0;
             self.isSpinning = false;
@@ -70,7 +70,7 @@
             self.spinner.css('opacity', '0');
             elem.unbind('touchstart.' + pluginName);
             elem.on('touchstart.' + pluginName, function(ev) {
-                self.inProgressTouchstart = self.inProgress;
+                self.inProgressTouchstart = (self.inProgress || (self.options.scrollingDom || elem.parent()).scrollTop() > 0);
                 if (self.options.paused || self.inProgress)
                     return false;
                 fingerOffset = ev.originalEvent.touches[0].pageY - offsetTop
@@ -116,46 +116,49 @@
                     $(document.body).unbind('touchmove.' + pluginName);
                     self.elast = true;
                 }
-            }, 5));
+            }, 10));
             elem.unbind('touchend.' + pluginName);
             elem.on('touchend.' + pluginName, function(ev) {
                 if (self.options.paused || self.inProgress)
                     return false;
 
                 if (top > 0) {
-                    if (top > self.options.pullThreshold) {
-                        self.inProgress = true;
-                        self.options.refresh.call(this, self);
-                        self.spinner.addClass('rotateLoop');
-                        self.isSpinning = true;
-                        elem.css({
-                            'transform': 'translateY(0)',
-                            'transition': 'transform 300ms ease'
-                        });
-                        self.indicator.css({
-                            'top': "0px",
-                            'transition': 'top 300ms ease'
-                        });
-                        if (self.options.spinnerTimeout) {
-                            if (self.doneTimeout) {
-                                clearTimeout(self.doneTimeout);
+                    setTimeout(function() {
+                        if (top > self.options.pullThreshold) {
+                            self.inProgress = true;
+                            self.options.refresh.call(this, self);
+                            self.spinner.addClass('rotateLoop');
+                            self.isSpinning = true;
+                            elem.css({
+                                'transform': 'translateY(0)',
+                                'transition': 'transform 300ms ease'
+                            });
+                            self.indicator.css({
+                                'top': "0px",
+                                'transition': 'top 300ms ease'
+                            });
+                            if (self.options.spinnerTimeout) {
+                                if (self.doneTimeout) {
+                                    clearTimeout(self.doneTimeout);
+                                }
+                                self.doneTimeout = setTimeout(function() {
+                                    self.done();
+                                }, self.options.spinnerTimeout);
                             }
-                            self.doneTimeout = setTimeout(function() {
-                                self.done();
-                            }, self.options.spinnerTimeout);
-                        }
 
-                    } else {
-                        self.indicator.css({
-                            'top': "-" + self.indicatorHeight + "px",
-                            'transition': 'top 300ms ease'
-                        });
-                        elem.css({
-                            'transform': 'translateY(-' + self.indicatorHeight + 'px)',
-                            'transition': 'transform 300ms ease'
-                        });
-                    }
-                    top = 0;
+                        } else {
+                            self.spinnerRotation = 0;
+                            self.indicator.css({
+                                'top': "-" + self.indicatorHeight + "px",
+                                'transition': 'top 300ms ease'
+                            });
+                            elem.css({
+                                'transform': 'translateY(-' + self.indicatorHeight + 'px)',
+                                'transition': 'transform 300ms ease'
+                            });
+                        }
+                        top = 0;
+                    }, 11);
                 }
                 setTimeout(function() {
                     elem.css({
