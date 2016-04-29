@@ -8,7 +8,13 @@ A live demo is [available here](http://aurasalexander.github.io/demo.html). On d
 
 ## Install
 
-Include jQuery, ptrLight.js and ptrLight.css
+- download the git repository or use bower
+
+```
+  bower install ptrLight
+```
+
+- include jQuery, ptrLight.js and ptrLight.css
 
 ```html
   <link rel="stylesheet" href="ptrLight.css">
@@ -105,3 +111,12 @@ Include jQuery, ptrLight.js and ptrLight.css
     };
   });
 ```
+
+## Changelog
+
+### v1.0.1
+- initial release
+- refactored code, base project: xpull
+- ptrLight won't trigger while already triggered
+- new spinner styling
+- throttled touchmove event
