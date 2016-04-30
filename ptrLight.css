@@ -1,18 +1,18 @@
 #ptr-light-indicator {
     width: 35px;
-    height: 35px;
+    height: 55px;
     margin: 0 auto;
-    padding: 15px 0;
     transform: translateY(0);
     position: relative;
-    top: -35px;
+    top: -55px;
     transition: transform 300ms ease;
 }
 #ptr-light-spinner {
     display: block;
-    height: 100%;
-    width: 100%;
-    position: relative;
+    height: 35px;
+    width: 35px;
+    position: absolute;
+    top: 10px;
     background: url('reload.svg');
     /*icon by loading.io*/
     background-size: contain;

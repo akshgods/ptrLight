@@ -5,8 +5,12 @@
             pullThreshold: 200,
             maxPullThreshold: 500,
             spinnerTimeout: 10000,
-            scrollingDom: null, // if null, specified element
-            refresh: function() {}
+            scrollingDom: null,
+            throttleTimeout: 10,
+            allowPtrWhenStartedWhileScrolled: false,
+            refresh: function() {
+                console.warn('Refresh detected. Please specify a "refresh" function in the ptrLight options object in order to actually get things done.');
+            }
         };
 
     function Plugin(element, options) {
@@ -51,6 +55,9 @@
             self.inProgress = false;
             self.inProgressTouchstart = false;
             self.indicatorHeight = self.indicator.outerHeight();
+            if (self.options.throttleTimeout < 1) {
+                self.options.throttleTimeout = 1;
+            }
             $(elem).css({
                 'transform': "translateY(-" + self.indicatorHeight + "px)"
             });
@@ -70,7 +77,7 @@
             self.spinner.css('opacity', '0');
             elem.unbind('touchstart.' + pluginName);
             elem.on('touchstart.' + pluginName, function(ev) {
-                self.inProgressTouchstart = (self.inProgress || (self.options.scrollingDom || elem.parent()).scrollTop() > 0);
+                self.inProgressTouchstart = (self.inProgress || (!self.options.allowPtrWhenStartedWhileScrolled && (self.options.scrollingDom || elem.parent()).scrollTop() > 0));
                 if (self.options.paused || self.inProgress)
                     return false;
                 fingerOffset = ev.originalEvent.touches[0].pageY - offsetTop
@@ -104,19 +111,20 @@
                             'top': (topTranslation - self.indicatorHeight) + "px"
                         });
 
-                        self.spinnerRotation = self.spinnerRotation > 359 ? 360 : 360 * (top / self.options.pullThreshold);
+                        self.spinnerRotation = 360 * (top / self.options.pullThreshold);
+                        self.spinnerRotation = self.spinnerRotation > 359 ? 360 : self.spinnerRotation;
 
                         self.spinner.css({
-                            'opacity': '1',
-                            'transform': 'rotate(' + self.spinnerRotation + 'deg)'
+                            'transform': 'rotate(' + self.spinnerRotation + 'deg)',
+                            'opacity': '1'
                         });
-
                     }
+
                 } else {
                     $(document.body).unbind('touchmove.' + pluginName);
                     self.elast = true;
                 }
-            }, 10));
+            }, self.options.throttleTimeout));
             elem.unbind('touchend.' + pluginName);
             elem.on('touchend.' + pluginName, function(ev) {
                 if (self.options.paused || self.inProgress)
@@ -158,7 +166,7 @@
                             });
                         }
                         top = 0;
-                    }, 11);
+                    }, (self.options.throttleTimeout + 1));
                 }
                 setTimeout(function() {
                     elem.css({
