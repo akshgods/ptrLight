@@ -47,20 +47,22 @@
             var self = this;
             var elem = $(self.element);
             self.elem = elem;
+            self.elemNode = elem[0];
             elem.parent().find('#ptr-light-indicator').remove();
             elem.parent().prepend('<div id="ptr-light-indicator"><div id="ptr-light-spinner"></div></div>');
             self.indicator = elem.parent().find('#ptr-light-indicator');
+            self.indicatorNode = self.indicator[0];
             self.spinner = elem.parent().find('#ptr-light-spinner');
+            self.spinnerNode = self.spinner[0];
             self.doneTimeout = null;
             self.inProgress = false;
             self.inProgressTouchstart = false;
             self.indicatorHeight = self.indicator.outerHeight();
+            self.transformProp = self.elemNode.style.transform === undefined ? "-webkit-transform" : "transform";
             if (self.options.throttleTimeout < 1) {
                 self.options.throttleTimeout = 1;
             }
-            $(elem).css({
-                'transform': "translateY(-" + self.indicatorHeight + "px)"
-            });
+            self.elemNode.style[self.transformProp] = "translateY(-" + self.indicatorHeight + "px)"
             elem.parent().css({
                 '-webkit-overflow-scrolling': 'touch'
             });
@@ -103,21 +105,16 @@
 
                     if (top <= self.options.maxPullThreshold) {
                         var topTranslation = self.getTopTranslation(top);
-                        $(elem).css({
-                            'transform': "translateY(" + (topTranslation - self.indicatorHeight) + "px)"
-                        });
+                        self.elemNode.style[self.transformProp] = "translateY(" + (topTranslation - self.indicatorHeight) + "px)";
 
-                        self.indicator.css({
-                            'top': (topTranslation - self.indicatorHeight) + "px"
-                        });
+                        self.indicatorNode.style.top = (topTranslation - self.indicatorHeight) + "px";
 
                         self.spinnerRotation = 360 * (top / self.options.pullThreshold);
                         self.spinnerRotation = self.spinnerRotation > 359 ? 360 : self.spinnerRotation;
+                        var opacity = self.spinnerRotation > 300 ? (1.0 - (((360 - self.spinnerRotation) / 600) * 6)) : 0.4;
 
-                        self.spinner.css({
-                            'transform': 'rotate(' + self.spinnerRotation + 'deg)',
-                            'opacity': '1'
-                        });
+                        self.spinnerNode.style[self.transformProp] = 'rotate(' + self.spinnerRotation + 'deg)';
+                        self.spinnerNode.style.opacity = opacity;
                     }
 
                 } else {
@@ -137,10 +134,8 @@
                             self.options.refresh.call(this, self);
                             self.spinner.addClass('rotateLoop');
                             self.isSpinning = true;
-                            elem.css({
-                                'transform': 'translateY(0)',
-                                'transition': 'transform 300ms ease'
-                            });
+                            self.elemNode.style[self.transformProp] = "translateY(0)";
+                            self.elemNode.style.transition = "transform 300ms ease";
                             self.indicator.css({
                                 'top': "0px",
                                 'transition': 'top 300ms ease'
@@ -160,10 +155,8 @@
                                 'top': "-" + self.indicatorHeight + "px",
                                 'transition': 'top 300ms ease'
                             });
-                            elem.css({
-                                'transform': 'translateY(-' + self.indicatorHeight + 'px)',
-                                'transition': 'transform 300ms ease'
-                            });
+                            self.elemNode.style[self.transformProp] = "translateY(-" + self.indicatorHeight + "px)";
+                            self.elemNode.style.transition = "transform 300ms ease";
                         }
                         top = 0;
                     }, (self.options.throttleTimeout + 1));
@@ -191,10 +184,8 @@
                 'top': "-" + self.indicatorHeight + "px",
                 'transition': 'top 300ms ease'
             });
-            elem.css({
-                'transform': 'translateY(-' + self.indicatorHeight + 'px)',
-                'transition': 'transform 300ms ease'
-            });
+            self.elemNode.style[self.transformProp] = "translateY(-" + self.indicatorHeight + "px)";
+            self.elemNode.style.transition = "transform 300ms ease";
             setTimeout(function() {
                 self.spinner.removeClass('rotateLoop');
                 self.isSpinning = false;
