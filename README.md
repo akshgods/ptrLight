@@ -146,6 +146,9 @@ A live demo is [available here](http://aurasalexander.github.io/demo.html). On d
 
 ## Changelog
 
+### v1.0.3
+- optimized performance on touchmove event calls
+
 ### v1.0.2
 - refactor the way the spinner positions itself
 - add configuration options throttleTimeout and allowPtrWhenStartedWhileScrolled
