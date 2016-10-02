@@ -35,14 +35,15 @@ A live demo is [available here](http://aurasalexander.github.io/demo.html). On d
 
 - craft your options:
   - **paused**: disable ptrLight temporarily
+  - **ignoreThreshold**: scroll distance in pixels that will not count towards the pull distance; the element won't move and an axis check will be applied to see if the user pulls the element vertically; this will
+                         prevent ptrLight from animating the element when the user swiped horizontally
   - **pullThreshold**: amount of pixels the scroll element needs to get pulled down by in order to execute the pull to refresh 'refresh()' function on drag stop
-      - *hint*: You can use something to extend of '$(window).height() / 3' as value to make the threshold dependent on the screen dimension. Neat for mobile where you wouldn't want to set the drag threshold to a pixel perfect amount that you carefully crafted on your 4" android device just to see it gloriously fail on a retina iPad.
+      - *hint*: You can use something to extend of `$(window).height() / 3` as value to make the threshold dependent on the screen dimension. Neat for mobile where you wouldn't want to set the drag threshold to a pixel perfect amount that you carefully crafted on your 4" android device just to see it gloriously fail on a retina iPad.
       - amount in pixel
   - **maxPullThreshold**: maximum amount of pixels the scroll element will be allowed to scroll down by
       - amount in pixel
-  - **spinnerTimeout**: reset the pull to refresh indicator after this amount of time
+  - **spinnerTimeout**: reset the pull to refresh indicator after this amount of time in ms or don't if the value is falsy
   - **scrollingDom**: if not otherwise specified here, the parent node of your selected element is assumed as the scroll element of your page
-  - **throttleTimeout**: touchmove events get throttled to prevent event flooding, event will only execute every <specified time in ms> (best between 1ms and 25ms)
   - **allowPtrWhenStartedWhileScrolled**:
       - *true*: a user can start his upward scroll/downward drag on a scroll position > 0, reaching the top and pulling even further to activate ptr
       - *false*: a user will have to scroll to the very top, release his tap/drag and drag again from scroll position 0 to activate the ptr
@@ -55,11 +56,11 @@ A live demo is [available here](http://aurasalexander.github.io/demo.html). On d
   /* all options are optional, but you will want to at least add your refresh() handler */
   var options = {
     paused: false,
+    ignoreThreshold: 20,
     pullThreshold: 200,
     maxPullThreshold: 500,
     spinnerTimeout: 10000,
     scrollingDom: $('selectorOfScrollableParent'),
-    throttleTimeout: 10,
     allowPtrWhenStartedWhileScrolled: false,
     refresh: function(ptrLightInstance) {
       console.log('Updating...');
@@ -145,6 +146,11 @@ A live demo is [available here](http://aurasalexander.github.io/demo.html). On d
 ```
 
 ## Changelog
+
+### v1.1.0
+- make use of requestAnimationFrame for silky smooth animation performance
+- removed throttleTimeout as it is obsolete now
+- refractored code
 
 ### v1.0.3
 - optimized performance on touchmove event calls
