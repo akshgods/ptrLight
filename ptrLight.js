@@ -28,7 +28,7 @@
             self.elemNode = elem[0];
 
             elem.parent().find('#ptr-light-indicator').remove();
-            elem.parent().prepend('<div id="ptr-light-indicator"><div id="ptr-light-spinner"></div></div>');
+            elem.before('<div id="ptr-light-indicator"><div id="ptr-light-spinner"></div></div>');
 
             self.indicator = elem.parent().find('#ptr-light-indicator');
             self.indicatorNode = self.indicator[0];
