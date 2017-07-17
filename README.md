@@ -147,6 +147,9 @@ A live demo is [available here](http://aurasalexander.github.io/demo.html). On d
 
 ## Changelog
 
+### v2.0.0
+- position pull indicator right before selector element instead as first child element of parent
+
 ### v1.1.0
 - make use of requestAnimationFrame for silky smooth animation performance
 - removed throttleTimeout as it is obsolete now
